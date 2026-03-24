@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EVM Project Dashboard — Interactive Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0f14;
+    --surface: #151922;
+    --surface-raised: #1a1f2b;
+    --border: rgba(255,255,255,0.07);
+    --text: #e8eaed;
+    --text-muted: #8b92a0;
+    --text-dim: #5a6172;
+    --blue: #4a9eff;
+    --blue-bg: rgba(74,158,255,0.1);
+    --green: #34d399;
+    --green-bg: rgba(52,211,153,0.1);
+    --red: #f87171;
+    --red-bg: rgba(248,113,113,0.1);
+    --amber: #fbbf24;
+    --amber-bg: rgba(251,191,36,0.1);
+    --purple: #a78bfa;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 32px;
+  }
+  .header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 28px;
+  }
+  .header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+  .header p {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    background: var(--red-bg);
+    color: var(--red);
+    border: 1px solid rgba(248,113,113,0.2);
+    font-weight: 500;
+  }
+  .badge.on-track { background: var(--green-bg); color: var(--green); border-color: rgba(52,211,153,0.2); }
+  .badge.at-risk { background: var(--amber-bg); color: var(--amber); border-color: rgba(251,191,36,0.2); }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .metric-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .metric-card.blue::before { background: var(--blue); }
+  .metric-card.green::before { background: var(--green); }
+  .metric-card.red::before { background: var(--red); }
+  .metric-card.amber::before { background: var(--amber); }
+  .metric-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .metric-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .metric-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+  }
+  .slider-row label {
+    font-size: 13px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    font-weight: 500;
+  }
+  .slider-row input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(to right, var(--blue) 0%, var(--blue) calc((var(--val) - 1) / 11 * 100%), #2a2f3d calc((var(--val) - 1) / 11 * 100%), #2a2f3d 100%);
+    outline: none;
+  }
+  .slider-row input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--blue);
+    border: 3px solid var(--bg);
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(74,158,255,0.4);
+  }
+  .month-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 70px;
+    text-align: right;
+    color: var(--blue);
+  }
+
+  .charts-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .chart-card h3 {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    letter-spacing: 0.02em;
+  }
+  .chart-wrap {
+    position: relative;
+    width: 100%;
+  }
+  .main-chart-wrap { height: 280px; }
+  .var-chart-wrap { height: 280px; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 14px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 2px;
+  }
+  .legend-line {
+    width: 20px; height: 0;
+    border-top: 1.5px dashed var(--text-dim);
+  }
+
+  .formula-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .formula-item {
+    color: var(--text-dim);
+  }
+  .formula-item span {
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .footer {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  .footer a { color: var(--blue); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>Earned value management dashboard</h1>
+    <p>IT infrastructure upgrade — $1,200K BAC — 12-month schedule</p>
+  </div>
+  <div class="badge" id="statusBadge">OVER BUDGET</div>
+</div>
+
+<div class="metrics" id="metricsGrid"></div>
+
+<div class="slider-row">
+  <label>Reporting period</label>
+  <input type="range" min="1" max="12" value="9" id="monthSlider" step="1" style="--val: 9;">
+  <div class="month-display" id="monthLabel">Month 9</div>
+</div>
+
+<div class="charts-row">
+  <div class="chart-card">
+    <h3>Cumulative cost curves</h3>
+    <div class="chart-wrap main-chart-wrap"><canvas id="mainChart"></canvas></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#4a9eff"></div>Planned value (PV)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#34d399"></div>Earned value (EV)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f87171"></div>Actual cost (AC)</div>
+      <div class="legend-item"><div class="legend-line"></div>BAC ($1,200K)</div>
+    </div>
+  </div>
+  <div class="chart-card">
+    <h3>Monthly variances</h3>
+    <div class="chart-wrap var-chart-wrap"><canvas id="varChart"></canvas></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div>Schedule variance</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f87171"></div>Cost variance</div>
+    </div>
+  </div>
+</div>
+
+<div class="formula-bar">
+  <div class="formula-item"><span>SV</span> = EV − PV</div>
+  <div class="formula-item"><span>CV</span> = EV − AC</div>
+  <div class="formula-item"><span>SPI</span> = EV ÷ PV</div>
+  <div class="formula-item"><span>CPI</span> = EV ÷ AC</div>
+</div>
+
+<div class="footer">
+  Built with Claude AI &middot; Interactive EVM demonstration &middot; <a href="https://www.linkedin.com/in/romanzeltser/" target="_blank">Roman Zeltser</a>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const labels = ['M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12'];
+const BAC = 1200;
+const PV = [80, 170, 280, 400, 520, 650, 780, 900, 1000, 1080, 1150, 1200];
+const EV = [70, 155, 260, 370, 475, 590, 710, 820, 910, 990, 1060, 1130];
+const AC = [90, 190, 310, 440, 570, 710, 850, 980, 1100, 1210, 1310, 1400];
+
+const colors = { blue: '#4a9eff', green: '#34d399', red: '#f87171', amber: '#fbbf24' };
+
+function sl(arr, n) { return arr.slice(0, n); }
+
+function renderMetrics(n) {
+  const pv = PV[n-1], ev = EV[n-1], ac = AC[n-1];
+  const sv = ev - pv, cv = ev - ac;
+  const spi = ev / pv, cpi = ev / ac;
+  const eac = Math.round(BAC / cpi);
+  const vac = BAC - eac;
+
+  const badge = document.getElementById('statusBadge');
+  if (cpi >= 1 && spi >= 1) { badge.textContent = 'ON TRACK'; badge.className = 'badge on-track'; }
+  else if (cpi >= 0.9 && spi >= 0.9) { badge.textContent = 'AT RISK'; badge.className = 'badge at-risk'; }
+  else { badge.textContent = 'OVER BUDGET'; badge.className = 'badge'; }
+
+  const cards = [
+    { label: 'Schedule variance', value: (sv >= 0 ? '+' : '') + '$' + sv + 'K', sub: 'SPI: ' + spi.toFixed(2), color: sv >= 0 ? 'green' : 'amber', valColor: sv >= 0 ? colors.green : colors.amber },
+    { label: 'Cost variance', value: (cv >= 0 ? '+' : '') + '$' + cv + 'K', sub: 'CPI: ' + cpi.toFixed(2), color: cv >= 0 ? 'green' : 'red', valColor: cv >= 0 ? colors.green : colors.red },
+    { label: 'Estimate at completion', value: '$' + eac + 'K', sub: 'BAC: $' + BAC + 'K', color: 'blue', valColor: colors.blue },
+    { label: 'Variance at completion', value: (vac >= 0 ? '+' : '') + '$' + vac + 'K', sub: '% complete: ' + Math.round(ev / BAC * 100) + '%', color: vac >= 0 ? 'green' : 'red', valColor: vac >= 0 ? colors.green : colors.red }
+  ];
+
+  document.getElementById('metricsGrid').innerHTML = cards.map(c =>
+    `<div class="metric-card ${c.color}">
+      <div class="metric-label">${c.label}</div>
+      <div class="metric-value" style="color:${c.valColor}">${c.value}</div>
+      <div class="metric-sub">${c.sub}</div>
+    </div>`
+  ).join('');
+}
+
+const chartOpts = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { display: false } },
+  scales: {
+    y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#5a6172', font: { family: 'JetBrains Mono', size: 10 }, callback: v => '$' + v + 'K' }, border: { color: 'transparent' } },
+    x: { grid: { display: false }, ticks: { color: '#5a6172', font: { family: 'JetBrains Mono', size: 10 }, autoSkip: false }, border: { color: 'transparent' } }
+  }
+};
+
+const mainChart = new Chart(document.getElementById('mainChart'), {
+  type: 'line',
+  data: {
+    labels,
+    datasets: [
+      { label: 'PV', data: sl(PV, 9), borderColor: colors.blue, backgroundColor: colors.blue + '18', fill: true, pointRadius: 3, pointBackgroundColor: colors.blue, borderWidth: 2, tension: 0.35 },
+      { label: 'EV', data: sl(EV, 9), borderColor: colors.green, backgroundColor: colors.green + '10', fill: true, pointRadius: 3, pointBackgroundColor: colors.green, borderWidth: 2, tension: 0.35 },
+      { label: 'AC', data: sl(AC, 9), borderColor: colors.red, backgroundColor: colors.red + '10', fill: true, pointRadius: 3, pointBackgroundColor: colors.red, borderWidth: 2, tension: 0.35 },
+      { label: 'BAC', data: Array(12).fill(BAC), borderColor: '#5a6172', borderDash: [6, 4], borderWidth: 1, pointRadius: 0, fill: false }
+    ]
+  },
+  options: { ...chartOpts, scales: { ...chartOpts.scales, y: { ...chartOpts.scales.y, min: 0, max: 1500 } },
+    plugins: { ...chartOpts.plugins, tooltip: { backgroundColor: '#1a1f2b', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, titleFont: { family: 'DM Sans' }, bodyFont: { family: 'JetBrains Mono', size: 12 }, callbacks: { label: c => c.dataset.label + ': $' + c.parsed.y + 'K' } } }
+  }
+});
+
+function getVars(n) {
+  const sv = [], cv = [];
+  for (let i = 0; i < n; i++) { sv.push(EV[i] - PV[i]); cv.push(EV[i] - AC[i]); }
+  return { sv, cv };
+}
+const v0 = getVars(9);
+const varChart = new Chart(document.getElementById('varChart'), {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [
+      { label: 'SV', data: v0.sv, backgroundColor: colors.amber + 'cc', borderRadius: 4, barPercentage: 0.7 },
+      { label: 'CV', data: v0.cv, backgroundColor: colors.red + 'cc', borderRadius: 4, barPercentage: 0.7 }
+    ]
+  },
+  options: { ...chartOpts,
+    plugins: { ...chartOpts.plugins, tooltip: { backgroundColor: '#1a1f2b', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, titleFont: { family: 'DM Sans' }, bodyFont: { family: 'JetBrains Mono', size: 12 }, callbacks: { label: c => c.dataset.label + ': $' + c.parsed.y + 'K' } } }
+  }
+});
+
+const slider = document.getElementById('monthSlider');
+slider.addEventListener('input', function() {
+  const n = parseInt(this.value);
+  this.style.setProperty('--val', n);
+  document.getElementById('monthLabel').textContent = 'Month ' + n;
+  mainChart.data.datasets[0].data = sl(PV, n);
+  mainChart.data.datasets[1].data = sl(EV, n);
+  mainChart.data.datasets[2].data = sl(AC, n);
+  mainChart.update();
+  const v = getVars(n);
+  varChart.data.datasets[0].data = v.sv;
+  varChart.data.datasets[1].data = v.cv;
+  varChart.update();
+  renderMetrics(n);
+});
+
+renderMetrics(9);
+</script>
+</body>
+</html>
