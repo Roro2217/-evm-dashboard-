@@ -1,383 +1,850 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EVM Project Dashboard — Interactive Demo</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0c0f14;
-    --surface: #151922;
-    --surface-raised: #1a1f2b;
-    --border: rgba(255,255,255,0.07);
-    --text: #e8eaed;
-    --text-muted: #8b92a0;
-    --text-dim: #5a6172;
-    --blue: #4a9eff;
-    --blue-bg: rgba(74,158,255,0.1);
-    --green: #34d399;
-    --green-bg: rgba(52,211,153,0.1);
-    --red: #f87171;
-    --red-bg: rgba(248,113,113,0.1);
-    --amber: #fbbf24;
-    --amber-bg: rgba(251,191,36,0.1);
-    --purple: #a78bfa;
-    --radius: 12px;
-    --radius-sm: 8px;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 32px;
-  }
-  .header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 28px;
-  }
-  .header h1 {
-    font-size: 22px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    margin-bottom: 4px;
-  }
-  .header p {
-    font-size: 13px;
-    color: var(--text-muted);
-  }
-  .badge {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    padding: 5px 12px;
-    border-radius: 20px;
-    background: var(--red-bg);
-    color: var(--red);
-    border: 1px solid rgba(248,113,113,0.2);
-    font-weight: 500;
-  }
-  .badge.on-track { background: var(--green-bg); color: var(--green); border-color: rgba(52,211,153,0.2); }
-  .badge.at-risk { background: var(--amber-bg); color: var(--amber); border-color: rgba(251,191,36,0.2); }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVM + Activity-Based Costing Dashboard — Interactive Demo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-  .metrics {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 14px;
-    margin-bottom: 24px;
-  }
-  .metric-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 18px 20px;
-    position: relative;
-    overflow: hidden;
-  }
-  .metric-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-  }
-  .metric-card.blue::before { background: var(--blue); }
-  .metric-card.green::before { background: var(--green); }
-  .metric-card.red::before { background: var(--red); }
-  .metric-card.amber::before { background: var(--amber); }
-  .metric-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-dim);
-    margin-bottom: 8px;
-    font-weight: 500;
-  }
-  .metric-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 26px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-  }
-  .metric-sub {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 4px;
-  }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  .slider-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 20px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 20px;
-  }
-  .slider-row label {
-    font-size: 13px;
-    color: var(--text-muted);
-    white-space: nowrap;
-    font-weight: 500;
-  }
-  .slider-row input[type=range] {
-    flex: 1;
-    -webkit-appearance: none;
-    height: 4px;
-    border-radius: 2px;
-    background: linear-gradient(to right, var(--blue) 0%, var(--blue) calc((var(--val) - 1) / 11 * 100%), #2a2f3d calc((var(--val) - 1) / 11 * 100%), #2a2f3d 100%);
-    outline: none;
-  }
-  .slider-row input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    background: var(--blue);
-    border: 3px solid var(--bg);
-    cursor: pointer;
-    box-shadow: 0 0 8px rgba(74,158,255,0.4);
-  }
-  .month-display {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 14px;
-    font-weight: 500;
-    min-width: 70px;
-    text-align: right;
-    color: var(--blue);
-  }
+        :root {
+            --bg-primary: #0f1729;
+            --bg-secondary: #162040;
+            --bg-card: #1a2647;
+            --bg-card-hover: #1f2d54;
+            --border: #2a3a6a;
+            --border-accent: #3d5299;
+            --text-primary: #e8ecf4;
+            --text-secondary: #8d9cc0;
+            --text-muted: #5a6a94;
+            --accent-blue: #4a9eff;
+            --accent-cyan: #22d3ee;
+            --accent-green: #34d399;
+            --accent-red: #f87171;
+            --accent-amber: #fbbf24;
+            --accent-purple: #a78bfa;
+            --glow-blue: rgba(74, 158, 255, 0.15);
+        }
 
-  .charts-row {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 14px;
-    margin-bottom: 14px;
-  }
-  .chart-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-  }
-  .chart-card h3 {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-muted);
-    margin-bottom: 14px;
-    letter-spacing: 0.02em;
-  }
-  .chart-wrap {
-    position: relative;
-    width: 100%;
-  }
-  .main-chart-wrap { height: 280px; }
-  .var-chart-wrap { height: 280px; }
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif;
+            line-height: 1.5;
+            min-height: 100vh;
+        }
 
-  .legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-top: 14px;
-    font-size: 11px;
-    color: var(--text-muted);
-  }
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .legend-dot {
-    width: 8px; height: 8px;
-    border-radius: 2px;
-  }
-  .legend-line {
-    width: 20px; height: 0;
-    border-top: 1.5px dashed var(--text-dim);
-  }
+        .dashboard-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 24px 32px;
+        }
 
-  .formula-bar {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px 20px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-  }
-  .formula-item {
-    color: var(--text-dim);
-  }
-  .formula-item span {
-    color: var(--text-muted);
-    font-weight: 500;
-  }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 28px;
+        }
+        .header-left h1 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+        .header-left .subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            border: 1px solid;
+        }
+        .status-badge.over-budget { background: rgba(248,113,113,0.1); color: var(--accent-red); border-color: rgba(248,113,113,0.25); }
+        .status-badge.at-risk { background: rgba(251,191,36,0.1); color: var(--accent-amber); border-color: rgba(251,191,36,0.25); }
+        .status-badge.on-track { background: rgba(52,211,153,0.1); color: var(--accent-green); border-color: rgba(52,211,153,0.25); }
 
-  .footer {
-    margin-top: 20px;
-    text-align: center;
-    font-size: 11px;
-    color: var(--text-dim);
-  }
-  .footer a { color: var(--blue); text-decoration: none; }
-</style>
+        /* Slider */
+        .slider-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .slider-section label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .slider-section input[type=range] {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 4px;
+            border-radius: 2px;
+            background: #2a3a6a;
+            outline: none;
+        }
+        .slider-section input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            border: 3px solid var(--bg-primary);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(34,211,238,0.4);
+        }
+        .month-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            min-width: 80px;
+            text-align: right;
+        }
+        .slider-hint {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+        }
+        .kpi-card.blue::before { background: var(--accent-blue); }
+        .kpi-card.green::before { background: var(--accent-green); }
+        .kpi-card.red::before { background: var(--accent-red); }
+        .kpi-card.amber::before { background: var(--accent-amber); }
+        .kpi-card.cyan::before { background: var(--accent-cyan); }
+        .kpi-card.purple::before { background: var(--accent-purple); }
+        .kpi-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .kpi-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 26px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        .kpi-value.positive { color: var(--accent-green); }
+        .kpi-value.negative { color: var(--accent-red); }
+        .kpi-value.neutral { color: var(--accent-blue); }
+        .kpi-value.warning { color: var(--accent-amber); }
+        .kpi-sub {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Charts */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .chart-card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+        .chart-svg {
+            width: 100%;
+            display: block;
+        }
+        .chart-svg text { font-family: 'JetBrains Mono', monospace; }
+        .chart-svg .axis-label { fill: var(--text-muted); font-size: 10px; }
+        .chart-svg .grid-line { stroke: rgba(42, 58, 106, 0.5); stroke-width: 0.5; }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 14px;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+        .legend-line { width: 20px; height: 0; border-top: 1.5px dashed var(--text-muted); }
+
+        /* Formula bar */
+        .formula-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        .formula-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+        .formula-item span { color: var(--accent-cyan); font-weight: 600; }
+
+        /* Section divider */
+        .section-divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 8px 0 28px;
+        }
+
+        /* ABC Section */
+        .abc-header {
+            margin-bottom: 20px;
+        }
+        .abc-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+        .abc-header .abc-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .abc-synced-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            background: rgba(34,211,238,0.1);
+            border: 1px solid rgba(34,211,238,0.2);
+            font-size: 11px;
+            color: var(--accent-cyan);
+            font-family: 'JetBrains Mono', monospace;
+            margin-left: 12px;
+        }
+        .abc-synced-badge::before {
+            content: '';
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* ABC Table */
+        .abc-table-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+        .abc-table-card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+        .abc-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .abc-table th {
+            text-align: left;
+            padding: 10px 12px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            font-weight: 500;
+        }
+        .abc-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(42,58,106,0.3);
+            color: var(--text-primary);
+        }
+        .abc-table tr:last-child td {
+            border-bottom: none;
+            font-weight: 600;
+            color: var(--accent-cyan);
+        }
+        .abc-table td:nth-child(n+3) {
+            font-family: 'JetBrains Mono', monospace;
+            text-align: right;
+        }
+        .abc-table th:nth-child(n+3) {
+            text-align: right;
+        }
+
+        /* ABC Bottom Row */
+        .abc-bottom-row {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* ABC Insight Cards */
+        .abc-insights {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .insight-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .insight-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 28px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            padding-bottom: 16px;
+        }
+        .footer a { color: var(--accent-cyan); text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+    </style>
 </head>
 <body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <h1>Earned Value Management Dashboard</h1>
+                <div class="subtitle">IT Infrastructure Upgrade — $1,200K BAC — 12-month schedule</div>
+            </div>
+            <div class="status-badge over-budget" id="statusBadge">OVER BUDGET</div>
+        </div>
 
-<div class="header">
-  <div>
-    <h1>Earned value management dashboard</h1>
-    <p>IT infrastructure upgrade — $1,200K BAC — 12-month schedule</p>
-  </div>
-  <div class="badge" id="statusBadge">OVER BUDGET</div>
-</div>
+        <!-- Slider -->
+        <div class="slider-section">
+            <label>Reporting period</label>
+            <input type="range" min="1" max="12" value="9" id="monthSlider" step="1">
+            <div class="month-display" id="monthLabel">Month 9</div>
+            <div class="slider-hint">← drag to scrub →</div>
+        </div>
 
-<div class="metrics" id="metricsGrid"></div>
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+            <div class="kpi-card amber">
+                <div class="kpi-label">Schedule variance</div>
+                <div class="kpi-value negative" id="svValue">$-90K</div>
+                <div class="kpi-sub" id="spiSub">SPI: 0.91</div>
+            </div>
+            <div class="kpi-card red">
+                <div class="kpi-label">Cost variance</div>
+                <div class="kpi-value negative" id="cvValue">$-190K</div>
+                <div class="kpi-sub" id="cpiSub">CPI: 0.83</div>
+            </div>
+            <div class="kpi-card blue">
+                <div class="kpi-label">Estimate at completion</div>
+                <div class="kpi-value neutral" id="eacValue">$1,451K</div>
+                <div class="kpi-sub" id="eacSub">BAC: $1,200K</div>
+            </div>
+            <div class="kpi-card red">
+                <div class="kpi-label">Variance at completion</div>
+                <div class="kpi-value negative" id="vacValue">$-251K</div>
+                <div class="kpi-sub" id="pctSub">% complete: 76%</div>
+            </div>
+        </div>
 
-<div class="slider-row">
-  <label>Reporting period</label>
-  <input type="range" min="1" max="12" value="9" id="monthSlider" step="1" style="--val: 9;">
-  <div class="month-display" id="monthLabel">Month 9</div>
-</div>
+        <!-- Charts Row -->
+        <div class="charts-row">
+            <div class="chart-card">
+                <h3>Cumulative Cost Curves</h3>
+                <svg id="mainChart" class="chart-svg" viewBox="0 0 700 300"></svg>
+                <div class="legend">
+                    <div class="legend-item"><div class="legend-dot" style="background:var(--accent-blue)"></div>Planned value (PV)</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:var(--accent-green)"></div>Earned value (EV)</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:var(--accent-red)"></div>Actual cost (AC)</div>
+                    <div class="legend-item"><div class="legend-line"></div>BAC ($1,200K)</div>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3>Cumulative Variances</h3>
+                <svg id="varChart" class="chart-svg" viewBox="0 0 340 300"></svg>
+                <div class="legend">
+                    <div class="legend-item"><div class="legend-dot" style="background:var(--accent-amber)"></div>Schedule variance</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:var(--accent-red)"></div>Cost variance</div>
+                </div>
+            </div>
+        </div>
 
-<div class="charts-row">
-  <div class="chart-card">
-    <h3>Cumulative cost curves</h3>
-    <div class="chart-wrap main-chart-wrap"><canvas id="mainChart"></canvas></div>
-    <div class="legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#4a9eff"></div>Planned value (PV)</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#34d399"></div>Earned value (EV)</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#f87171"></div>Actual cost (AC)</div>
-      <div class="legend-item"><div class="legend-line"></div>BAC ($1,200K)</div>
+        <!-- Formula Bar -->
+        <div class="formula-bar">
+            <div class="formula-item"><span>SV</span> = EV − PV</div>
+            <div class="formula-item"><span>CV</span> = EV − AC</div>
+            <div class="formula-item"><span>SPI</span> = EV ÷ PV</div>
+            <div class="formula-item"><span>CPI</span> = EV ÷ AC</div>
+        </div>
+
+        <!-- Section Divider -->
+        <hr class="section-divider">
+
+        <!-- ABC Section -->
+        <div class="abc-header">
+            <h2>Activity-Based Cost Allocation
+                <span class="abc-synced-badge" id="abcSyncBadge">Synced to reporting period</span>
+            </h2>
+            <div class="abc-subtitle">Indirect cost pools scaled to cumulative project progress through <strong id="abcMonthLabel" style="color:var(--accent-cyan)">Month 9</strong></div>
+        </div>
+
+        <!-- ABC Table -->
+        <div class="abc-table-card">
+            <h3>Cost Pool Allocation by Activity Driver</h3>
+            <table class="abc-table">
+                <thead>
+                    <tr>
+                        <th>Activity / cost pool</th>
+                        <th>Driver</th>
+                        <th>Rate</th>
+                        <th>Vol. (to date)</th>
+                        <th>Allocated cost</th>
+                        <th>% of total</th>
+                    </tr>
+                </thead>
+                <tbody id="abcTableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- ABC Bottom Row: Chart + Insights -->
+        <div class="abc-bottom-row">
+            <div class="chart-card">
+                <h3>Activity Cost Pool Breakdown <span style="font-weight:400;color:var(--text-muted);font-size:12px;">— through <span id="abcChartMonthLabel" style="color:var(--accent-cyan)">Month 9</span></span></h3>
+                <svg id="abcBarChart" class="chart-svg" viewBox="0 0 600 280"></svg>
+            </div>
+            <div class="abc-insights">
+                <div class="insight-card kpi-card cyan">
+                    <div class="kpi-label">Indirect allocated (to date)</div>
+                    <div class="kpi-value neutral" id="totalIndirect">$292K</div>
+                    <div class="kpi-sub">Across 6 activity cost pools</div>
+                </div>
+                <div class="insight-card kpi-card purple">
+                    <div class="kpi-label">Highest cost driver</div>
+                    <div class="kpi-value" style="font-size:17px;color:var(--accent-purple)" id="topDriver">Systems Integration</div>
+                    <div class="kpi-sub" id="topDriverPct">36.0% of indirect allocation</div>
+                </div>
+                <div class="insight-card kpi-card amber">
+                    <div class="kpi-label">Overhead rate (indirect ÷ EV)</div>
+                    <div class="kpi-value warning" id="overheadRate">35.1%</div>
+                    <div class="kpi-sub" id="overheadSub">$292K indirect ÷ $830K EV</div>
+                </div>
+                <div class="insight-card kpi-card green">
+                    <div class="kpi-label">Wrap rate (loaded ÷ direct labor)</div>
+                    <div class="kpi-value positive" id="wrapRate">2.25x</div>
+                    <div class="kpi-sub" id="wrapSub">$1,122K loaded ÷ $498K direct</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            Built with Claude AI · Interactive EVM + ABC demonstration · <a href="https://www.linkedin.com/in/romanzeltser" target="_blank">Roman Zeltser</a>
+        </div>
     </div>
-  </div>
-  <div class="chart-card">
-    <h3>Monthly variances</h3>
-    <div class="chart-wrap var-chart-wrap"><canvas id="varChart"></canvas></div>
-    <div class="legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div>Schedule variance</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#f87171"></div>Cost variance</div>
-    </div>
-  </div>
-</div>
 
-<div class="formula-bar">
-  <div class="formula-item"><span>SV</span> = EV − PV</div>
-  <div class="formula-item"><span>CV</span> = EV − AC</div>
-  <div class="formula-item"><span>SPI</span> = EV ÷ PV</div>
-  <div class="formula-item"><span>CPI</span> = EV ÷ AC</div>
-</div>
+    <script>
+    // ═══════════════════════════════════════════════════════
+    // DATA
+    // ═══════════════════════════════════════════════════════
 
-<div class="footer">
-  Built with Claude AI &middot; Interactive EVM demonstration &middot; <a href="https://www.linkedin.com/in/romanzeltser/" target="_blank">Roman Zeltser</a>
-</div>
+    const BAC = 1200;
+    const pvData = [80, 170, 280, 400, 520, 650, 780, 900, 1000, 1080, 1150, 1200];
+    const evData = [70, 155, 260, 370, 475, 590, 710, 820, 910, 990, 1060, 1130];
+    const acData = [90, 190, 310, 440, 570, 710, 850, 980, 1100, 1210, 1310, 1400];
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script>
-const labels = ['M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12'];
-const BAC = 1200;
-const PV = [80, 170, 280, 400, 520, 650, 780, 900, 1000, 1080, 1150, 1200];
-const EV = [70, 155, 260, 370, 475, 590, 710, 820, 910, 990, 1060, 1130];
-const AC = [90, 190, 310, 440, 570, 710, 850, 980, 1100, 1210, 1310, 1400];
+    // ABC: full-project volumes (at month 12 / 100% complete)
+    const abcActivities = [
+        { name: "Systems Integration & Testing", driver: "Integration hrs", rate: 125, fullVolume: 1200, color: "#4a9eff" },
+        { name: "Program Management & Oversight", driver: "PM labor hrs", rate: 145, fullVolume: 680, color: "#22d3ee" },
+        { name: "Quality Assurance & Compliance", driver: "QA test cycles", rate: 850, fullVolume: 92, color: "#34d399" },
+        { name: "Configuration Management", driver: "Config items", rate: 42, fullVolume: 1150, color: "#a78bfa" },
+        { name: "Procurement & Vendor Mgmt", driver: "Purchase orders", rate: 380, fullVolume: 64, color: "#fbbf24" },
+        { name: "Training & Knowledge Transfer", driver: "Training hrs", rate: 95, fullVolume: 240, color: "#f87171" }
+    ];
 
-const colors = { blue: '#4a9eff', green: '#34d399', red: '#f87171', amber: '#fbbf24' };
+    // Non-linear accumulation curves per activity (% of full volume at each month)
+    const accumCurves = {
+        "Systems Integration & Testing":    [0.02, 0.06, 0.12, 0.20, 0.32, 0.46, 0.60, 0.73, 0.84, 0.92, 0.97, 1.00],
+        "Program Management & Oversight":   [0.08, 0.16, 0.24, 0.33, 0.42, 0.52, 0.62, 0.73, 0.83, 0.91, 0.96, 1.00],
+        "Quality Assurance & Compliance":    [0.01, 0.03, 0.06, 0.10, 0.18, 0.28, 0.42, 0.58, 0.74, 0.87, 0.95, 1.00],
+        "Configuration Management":         [0.03, 0.08, 0.15, 0.25, 0.38, 0.52, 0.66, 0.78, 0.88, 0.94, 0.98, 1.00],
+        "Procurement & Vendor Mgmt":        [0.12, 0.25, 0.40, 0.55, 0.68, 0.78, 0.85, 0.90, 0.94, 0.97, 0.99, 1.00],
+        "Training & Knowledge Transfer":    [0.01, 0.02, 0.04, 0.07, 0.12, 0.20, 0.32, 0.48, 0.65, 0.80, 0.92, 1.00]
+    };
 
-function sl(arr, n) { return arr.slice(0, n); }
+    // ═══════════════════════════════════════════════════════
+    // EVM CHART RENDERING
+    // ═══════════════════════════════════════════════════════
 
-function renderMetrics(n) {
-  const pv = PV[n-1], ev = EV[n-1], ac = AC[n-1];
-  const sv = ev - pv, cv = ev - ac;
-  const spi = ev / pv, cpi = ev / ac;
-  const eac = Math.round(BAC / cpi);
-  const vac = BAC - eac;
+    function drawMainChart(month) {
+        const svg = document.getElementById('mainChart');
+        const W = 700, H = 300;
+        const pad = { top: 20, right: 20, bottom: 35, left: 55 };
+        const chartW = W - pad.left - pad.right;
+        const chartH = H - pad.top - pad.bottom;
 
-  const badge = document.getElementById('statusBadge');
-  if (cpi >= 1 && spi >= 1) { badge.textContent = 'ON TRACK'; badge.className = 'badge on-track'; }
-  else if (cpi >= 0.9 && spi >= 0.9) { badge.textContent = 'AT RISK'; badge.className = 'badge at-risk'; }
-  else { badge.textContent = 'OVER BUDGET'; badge.className = 'badge'; }
+        let html = '';
 
-  const cards = [
-    { label: 'Schedule variance', value: (sv >= 0 ? '+' : '') + '$' + sv + 'K', sub: 'SPI: ' + spi.toFixed(2), color: sv >= 0 ? 'green' : 'amber', valColor: sv >= 0 ? colors.green : colors.amber },
-    { label: 'Cost variance', value: (cv >= 0 ? '+' : '') + '$' + cv + 'K', sub: 'CPI: ' + cpi.toFixed(2), color: cv >= 0 ? 'green' : 'red', valColor: cv >= 0 ? colors.green : colors.red },
-    { label: 'Estimate at completion', value: '$' + eac + 'K', sub: 'BAC: $' + BAC + 'K', color: 'blue', valColor: colors.blue },
-    { label: 'Variance at completion', value: (vac >= 0 ? '+' : '') + '$' + vac + 'K', sub: '% complete: ' + Math.round(ev / BAC * 100) + '%', color: vac >= 0 ? 'green' : 'red', valColor: vac >= 0 ? colors.green : colors.red }
-  ];
+        // Y-axis grid
+        const yMax = 1500;
+        for (let v = 0; v <= yMax; v += 200) {
+            const y = pad.top + chartH - (v / yMax * chartH);
+            html += `<line x1="${pad.left}" y1="${y}" x2="${W - pad.right}" y2="${y}" class="grid-line"/>`;
+            html += `<text x="${pad.left - 8}" y="${y + 3}" text-anchor="end" class="axis-label">$${v}K</text>`;
+        }
 
-  document.getElementById('metricsGrid').innerHTML = cards.map(c =>
-    `<div class="metric-card ${c.color}">
-      <div class="metric-label">${c.label}</div>
-      <div class="metric-value" style="color:${c.valColor}">${c.value}</div>
-      <div class="metric-sub">${c.sub}</div>
-    </div>`
-  ).join('');
-}
+        // X-axis labels
+        for (let i = 0; i < 12; i++) {
+            const x = pad.left + ((i + 0.5) / 12) * chartW;
+            html += `<text x="${x}" y="${H - 8}" text-anchor="middle" class="axis-label" ${i >= month ? 'opacity="0.3"' : ''}>M${i + 1}</text>`;
+        }
 
-const chartOpts = {
-  responsive: true, maintainAspectRatio: false,
-  plugins: { legend: { display: false } },
-  scales: {
-    y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#5a6172', font: { family: 'JetBrains Mono', size: 10 }, callback: v => '$' + v + 'K' }, border: { color: 'transparent' } },
-    x: { grid: { display: false }, ticks: { color: '#5a6172', font: { family: 'JetBrains Mono', size: 10 }, autoSkip: false }, border: { color: 'transparent' } }
-  }
-};
+        // BAC line
+        const bacY = pad.top + chartH - (BAC / yMax * chartH);
+        html += `<line x1="${pad.left}" y1="${bacY}" x2="${W - pad.right}" y2="${bacY}" stroke="var(--text-muted)" stroke-dasharray="6,4" stroke-width="1"/>`;
 
-const mainChart = new Chart(document.getElementById('mainChart'), {
-  type: 'line',
-  data: {
-    labels,
-    datasets: [
-      { label: 'PV', data: sl(PV, 9), borderColor: colors.blue, backgroundColor: colors.blue + '18', fill: true, pointRadius: 3, pointBackgroundColor: colors.blue, borderWidth: 2, tension: 0.35 },
-      { label: 'EV', data: sl(EV, 9), borderColor: colors.green, backgroundColor: colors.green + '10', fill: true, pointRadius: 3, pointBackgroundColor: colors.green, borderWidth: 2, tension: 0.35 },
-      { label: 'AC', data: sl(AC, 9), borderColor: colors.red, backgroundColor: colors.red + '10', fill: true, pointRadius: 3, pointBackgroundColor: colors.red, borderWidth: 2, tension: 0.35 },
-      { label: 'BAC', data: Array(12).fill(BAC), borderColor: '#5a6172', borderDash: [6, 4], borderWidth: 1, pointRadius: 0, fill: false }
-    ]
-  },
-  options: { ...chartOpts, scales: { ...chartOpts.scales, y: { ...chartOpts.scales.y, min: 0, max: 1500 } },
-    plugins: { ...chartOpts.plugins, tooltip: { backgroundColor: '#1a1f2b', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, titleFont: { family: 'DM Sans' }, bodyFont: { family: 'JetBrains Mono', size: 12 }, callbacks: { label: c => c.dataset.label + ': $' + c.parsed.y + 'K' } } }
-  }
-});
+        // Helper: data to points
+        function toPoints(data, n) {
+            let pts = [];
+            for (let i = 0; i < n; i++) {
+                const x = pad.left + ((i + 0.5) / 12) * chartW;
+                const y = pad.top + chartH - (data[i] / yMax * chartH);
+                pts.push(`${x},${y}`);
+            }
+            return pts;
+        }
 
-function getVars(n) {
-  const sv = [], cv = [];
-  for (let i = 0; i < n; i++) { sv.push(EV[i] - PV[i]); cv.push(EV[i] - AC[i]); }
-  return { sv, cv };
-}
-const v0 = getVars(9);
-const varChart = new Chart(document.getElementById('varChart'), {
-  type: 'bar',
-  data: {
-    labels,
-    datasets: [
-      { label: 'SV', data: v0.sv, backgroundColor: colors.amber + 'cc', borderRadius: 4, barPercentage: 0.7 },
-      { label: 'CV', data: v0.cv, backgroundColor: colors.red + 'cc', borderRadius: 4, barPercentage: 0.7 }
-    ]
-  },
-  options: { ...chartOpts,
-    plugins: { ...chartOpts.plugins, tooltip: { backgroundColor: '#1a1f2b', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, titleFont: { family: 'DM Sans' }, bodyFont: { family: 'JetBrains Mono', size: 12 }, callbacks: { label: c => c.dataset.label + ': $' + c.parsed.y + 'K' } } }
-  }
-});
+        // Area fills
+        function drawArea(data, n, color) {
+            const pts = toPoints(data, n);
+            const baseY = pad.top + chartH;
+            const first = pts[0].split(',')[0];
+            const last = pts[pts.length - 1].split(',')[0];
+            return `<polygon points="${first},${baseY} ${pts.join(' ')} ${last},${baseY}" fill="${color}" opacity="0.1"/>`;
+        }
 
-const slider = document.getElementById('monthSlider');
-slider.addEventListener('input', function() {
-  const n = parseInt(this.value);
-  this.style.setProperty('--val', n);
-  document.getElementById('monthLabel').textContent = 'Month ' + n;
-  mainChart.data.datasets[0].data = sl(PV, n);
-  mainChart.data.datasets[1].data = sl(EV, n);
-  mainChart.data.datasets[2].data = sl(AC, n);
-  mainChart.update();
-  const v = getVars(n);
-  varChart.data.datasets[0].data = v.sv;
-  varChart.data.datasets[1].data = v.cv;
-  varChart.update();
-  renderMetrics(n);
-});
+        html += drawArea(pvData, month, '#4a9eff');
+        html += drawArea(evData, month, '#34d399');
+        html += drawArea(acData, month, '#f87171');
 
-renderMetrics(9);
-</script>
+        // Lines
+        function drawLine(data, n, color) {
+            const pts = toPoints(data, n);
+            let h = `<polyline points="${pts.join(' ')}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round"/>`;
+            pts.forEach(p => {
+                const [cx, cy] = p.split(',');
+                h += `<circle cx="${cx}" cy="${cy}" r="3.5" fill="${color}" stroke="var(--bg-primary)" stroke-width="1.5"/>`;
+            });
+            return h;
+        }
+
+        html += drawLine(pvData, month, '#4a9eff');
+        html += drawLine(evData, month, '#34d399');
+        html += drawLine(acData, month, '#f87171');
+
+        svg.innerHTML = html;
+    }
+
+    function drawVarianceChart(month) {
+        const svg = document.getElementById('varChart');
+        const W = 340, H = 300;
+        const pad = { top: 20, right: 15, bottom: 35, left: 50 };
+        const chartW = W - pad.left - pad.right;
+        const chartH = H - pad.top - pad.bottom;
+
+        let html = '';
+
+        // Compute cumulative variances
+        let maxVar = 10;
+        for (let i = 0; i < month; i++) {
+            const cumSV = evData[i] - pvData[i];
+            const cumCV = evData[i] - acData[i];
+            maxVar = Math.max(maxVar, Math.abs(cumSV), Math.abs(cumCV));
+        }
+        maxVar = Math.ceil(maxVar / 20) * 20 + 20;
+
+        // Zero line
+        const zeroY = pad.top + chartH / 2;
+
+        // Y-axis grid
+        for (let v = -maxVar; v <= maxVar; v += 40) {
+            const y = zeroY - (v / maxVar * (chartH / 2));
+            html += `<line x1="${pad.left}" y1="${y}" x2="${W - pad.right}" y2="${y}" class="grid-line"/>`;
+            html += `<text x="${pad.left - 6}" y="${y + 3}" text-anchor="end" class="axis-label">$${v}K</text>`;
+        }
+
+        // Zero line emphasis
+        html += `<line x1="${pad.left}" y1="${zeroY}" x2="${W - pad.right}" y2="${zeroY}" stroke="var(--text-muted)" stroke-width="1"/>`;
+
+        const barW = (chartW / 12 - 6) / 2;
+
+        for (let i = 0; i < month; i++) {
+            const cumSV = evData[i] - pvData[i];
+            const cumCV = evData[i] - acData[i];
+            const groupX = pad.left + ((i + 0.5) / 12) * chartW;
+
+            // SV bar
+            const svH = Math.abs(cumSV) / maxVar * (chartH / 2);
+            const svY = cumSV >= 0 ? zeroY - svH : zeroY;
+            html += `<rect x="${groupX - barW - 1}" y="${svY}" width="${barW}" height="${Math.max(svH, 1)}" fill="#fbbf24" rx="2" opacity="0.85"/>`;
+
+            // CV bar
+            const cvH = Math.abs(cumCV) / maxVar * (chartH / 2);
+            const cvY = cumCV >= 0 ? zeroY - cvH : zeroY;
+            html += `<rect x="${groupX + 1}" y="${cvY}" width="${barW}" height="${Math.max(cvH, 1)}" fill="#f87171" rx="2" opacity="0.85"/>`;
+        }
+
+        // X labels
+        for (let i = 0; i < 12; i++) {
+            const x = pad.left + ((i + 0.5) / 12) * chartW;
+            html += `<text x="${x}" y="${H - 8}" text-anchor="middle" class="axis-label" ${i >= month ? 'opacity="0.3"' : ''}>M${i + 1}</text>`;
+        }
+
+        svg.innerHTML = html;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // ABC RENDERING
+    // ═══════════════════════════════════════════════════════
+
+    function getABCData(month) {
+        return abcActivities.map(a => {
+            const curve = accumCurves[a.name];
+            const pctAccum = curve[month - 1];
+            const vol = Math.round(a.fullVolume * pctAccum);
+            const cost = Math.round(a.rate * vol / 1000);
+            return { ...a, volume: vol, cost: cost };
+        });
+    }
+
+    function renderABCTable(month) {
+        const data = getABCData(month);
+        const totalCost = data.reduce((s, d) => s + d.cost, 0);
+        const tbody = document.getElementById('abcTableBody');
+
+        let html = '';
+        data.forEach(d => {
+            const pct = totalCost > 0 ? (d.cost / totalCost * 100).toFixed(1) : '0.0';
+            html += `<tr>
+                <td>${d.name}</td>
+                <td style="color:var(--text-secondary)">${d.driver}</td>
+                <td>$${d.rate}</td>
+                <td>${d.volume.toLocaleString()}</td>
+                <td>$${d.cost}K</td>
+                <td>${pct}%</td>
+            </tr>`;
+        });
+        html += `<tr>
+            <td>Total indirect (to date)</td>
+            <td></td><td></td><td></td>
+            <td>$${totalCost}K</td>
+            <td>100%</td>
+        </tr>`;
+        tbody.innerHTML = html;
+    }
+
+    function drawABCBarChart(month) {
+        const svg = document.getElementById('abcBarChart');
+        const data = getABCData(month);
+        const fullData = getABCData(12);
+        const W = 600, H = 280;
+        const pad = { top: 20, right: 20, bottom: 55, left: 50 };
+        const chartW = W - pad.left - pad.right;
+        const chartH = H - pad.top - pad.bottom;
+
+        const maxCost = Math.max(...fullData.map(d => d.cost)) + 10;
+
+        let html = '';
+
+        // Y grid
+        const step = Math.ceil(maxCost / 4 / 10) * 10;
+        for (let v = 0; v <= maxCost; v += step) {
+            const y = pad.top + chartH - (v / maxCost * chartH);
+            html += `<line x1="${pad.left}" y1="${y}" x2="${W - pad.right}" y2="${y}" class="grid-line"/>`;
+            html += `<text x="${pad.left - 6}" y="${y + 3}" text-anchor="end" class="axis-label">$${v}K</text>`;
+        }
+
+        const barW = Math.min(60, chartW / data.length - 20);
+
+        data.forEach((d, i) => {
+            const x = pad.left + (i + 0.5) / data.length * chartW - barW / 2;
+            const fullH = fullData[i].cost / maxCost * chartH;
+            const h = d.cost / maxCost * chartH;
+            const y = pad.top + chartH - h;
+            const fullY = pad.top + chartH - fullH;
+
+            // Ghost bar (full project)
+            html += `<rect x="${x}" y="${fullY}" width="${barW}" height="${fullH}" fill="none" stroke="${d.color}" stroke-width="1" stroke-dasharray="3,2" opacity="0.3" rx="3"/>`;
+
+            // Actual bar
+            html += `<rect x="${x}" y="${y}" width="${barW}" height="${Math.max(h, 1)}" fill="${d.color}" rx="3" opacity="0.85"/>`;
+
+            // Value label
+            if (d.cost > 0) {
+                html += `<text x="${x + barW / 2}" y="${y - 6}" text-anchor="middle" fill="${d.color}" font-size="11" font-weight="600">$${d.cost}K</text>`;
+            }
+
+            // Name label (truncated)
+            const label = d.name.length > 16 ? d.name.substring(0, 16) + '...' : d.name;
+            html += `<text x="${x + barW / 2}" y="${H - 30}" text-anchor="middle" class="axis-label" font-size="10">${label}</text>`;
+            html += `<text x="${x + barW / 2}" y="${H - 14}" text-anchor="middle" fill="var(--text-muted)" font-family="'JetBrains Mono',monospace" font-size="9">${d.driver}</text>`;
+        });
+
+        svg.innerHTML = html;
+    }
+
+    function updateABCInsights(month) {
+        const data = getABCData(month);
+        const ev = evData[month - 1];
+        const ac = acData[month - 1];
+        const totalIndirect = data.reduce((s, d) => s + d.cost, 0);
+
+        // Find top driver
+        const top = data.reduce((a, b) => a.cost > b.cost ? a : b);
+        const topPct = totalIndirect > 0 ? (top.cost / totalIndirect * 100).toFixed(1) : '0.0';
+
+        document.getElementById('totalIndirect').textContent = `$${totalIndirect}K`;
+        document.getElementById('topDriver').textContent = top.name.split(' ')[0] + ' ' + (top.name.split(' ')[1] || '');
+        document.getElementById('topDriverPct').textContent = `${topPct}% of indirect allocation`;
+
+        // Overhead rate = indirect / EV
+        const ohRate = ev > 0 ? (totalIndirect / ev * 100).toFixed(1) : '0.0';
+        document.getElementById('overheadRate').textContent = `${ohRate}%`;
+        document.getElementById('overheadSub').textContent = `$${totalIndirect}K indirect ÷ $${ev}K EV`;
+
+        // Wrap rate = (AC) / (AC - indirect) as proxy for loaded/direct
+        const directLabor = Math.max(ac - totalIndirect, 1);
+        const wrap = (ac / directLabor).toFixed(2);
+        document.getElementById('wrapRate').textContent = `${wrap}x`;
+        document.getElementById('wrapSub').textContent = `$${ac}K loaded ÷ $${directLabor}K direct`;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // MASTER UPDATE
+    // ═══════════════════════════════════════════════════════
+
+    function updateDashboard(month) {
+        const m = month - 1;
+        const ev = evData[m], pv = pvData[m], ac = acData[m];
+        const sv = ev - pv, cv = ev - ac;
+        const spi = ev / pv, cpi = ev / ac;
+        const eac = Math.round(BAC / cpi);
+        const vac = BAC - eac;
+        const pct = Math.round(ev / BAC * 100);
+
+        // KPI cards
+        document.getElementById('svValue').textContent = `$${sv >= 0 ? '' : '-'}${Math.abs(sv)}K`;
+        document.getElementById('svValue').className = `kpi-value ${sv >= 0 ? 'positive' : 'negative'}`;
+        document.getElementById('spiSub').textContent = `SPI: ${spi.toFixed(2)}`;
+
+        document.getElementById('cvValue').textContent = `$${cv >= 0 ? '' : '-'}${Math.abs(cv)}K`;
+        document.getElementById('cvValue').className = `kpi-value ${cv >= 0 ? 'positive' : 'negative'}`;
+        document.getElementById('cpiSub').textContent = `CPI: ${cpi.toFixed(2)}`;
+
+        document.getElementById('eacValue').textContent = `$${eac.toLocaleString()}K`;
+        document.getElementById('eacValue').className = `kpi-value ${eac <= BAC ? 'positive' : 'neutral'}`;
+        document.getElementById('eacSub').textContent = `BAC: $${BAC}K`;
+
+        document.getElementById('vacValue').textContent = `$${vac >= 0 ? '' : '-'}${Math.abs(vac)}K`;
+        document.getElementById('vacValue').className = `kpi-value ${vac >= 0 ? 'positive' : 'negative'}`;
+        document.getElementById('pctSub').textContent = `% complete: ${pct}%`;
+
+        // Status badge
+        const badge = document.getElementById('statusBadge');
+        if (cpi >= 1 && spi >= 1) { badge.textContent = 'ON TRACK'; badge.className = 'status-badge on-track'; }
+        else if (cpi >= 0.9 && spi >= 0.9) { badge.textContent = 'AT RISK'; badge.className = 'status-badge at-risk'; }
+        else { badge.textContent = 'OVER BUDGET'; badge.className = 'status-badge over-budget'; }
+
+        // Month labels
+        document.getElementById('monthLabel').textContent = `Month ${month}`;
+        document.getElementById('abcMonthLabel').textContent = `Month ${month}`;
+        document.getElementById('abcChartMonthLabel').textContent = `Month ${month}`;
+
+        // EVM charts
+        drawMainChart(month);
+        drawVarianceChart(month);
+
+        // ABC (fully synced)
+        renderABCTable(month);
+        drawABCBarChart(month);
+        updateABCInsights(month);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // INIT
+    // ═══════════════════════════════════════════════════════
+
+    const slider = document.getElementById('monthSlider');
+    slider.addEventListener('input', (e) => {
+        updateDashboard(parseInt(e.target.value));
+    });
+
+    updateDashboard(9);
+    </script>
 </body>
 </html>
